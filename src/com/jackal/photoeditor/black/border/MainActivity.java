@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
 	private static final int SELECT_PHOTO = 100;
+	private static final int DOWN_SAMPLE_BOUNDARY = 1080;
 	private static final String TAG = "Black_Border";
 	private long gMaxBoundary = -1;
 
@@ -91,8 +92,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			o = new BitmapFactory.Options();
 			o.inPurgeable = true;
 			//o.inSampleSize = 1;
-			o.inSampleSize = 2;
-			boundary /= 2;
+			if (boundary > DOWN_SAMPLE_BOUNDARY) {
+				o.inSampleSize = 2;
+				boundary /= 2;
+			}
 
 			// If the boundary is bigger than the max boundary, down sampling the source bitmap
 			while (boundary > gMaxBoundary) {
@@ -100,13 +103,13 @@ public class MainActivity extends Activity implements OnClickListener {
 				boundary /= 2;
 			}
 
-			//if (o.inSampleSize > 2) {
-			width_tmp /= (o.inSampleSize - 1) * 2;
-			height_tmp /= (o.inSampleSize - 1) * 2;				
-			//} else {
-				//width_tmp /= o.inSampleSize;
-				//height_tmp /= o.inSampleSize;
-			//}
+			if (o.inSampleSize > 2) {
+				width_tmp /= (o.inSampleSize - 1) * 2;
+				height_tmp /= (o.inSampleSize - 1) * 2;				
+			} else {
+				width_tmp /= o.inSampleSize;
+				height_tmp /= o.inSampleSize;
+			}
 
 			// reflection to set the hidden variable for allocating memory to native not heap memory.
 			try { BitmapFactory.Options.class.getField("inNativeAlloc").setBoolean(o, true); }
