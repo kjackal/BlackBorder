@@ -26,16 +26,20 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-//import android.view.Menu;
-
 public class MainActivity extends Activity implements OnClickListener {
 	private static final int SELECT_PHOTO = 100;
 	private static final String TAG = "Black_Border";
+	private long gMaxBoundary = -1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
+		
+		// Get the max heap size to get the max boundary to avoid OutOfMemory excpetion.
+		long maxMemory = Runtime.getRuntime().maxMemory();
+		gMaxBoundary = (long) Math.pow((maxMemory /4), 0.5);
+		Log.d(TAG, "The maxMemory: " + maxMemory + ", maxBoundary: " + gMaxBoundary);
 
 		Button button = (Button) findViewById(R.id.startButton);
 		button.setOnClickListener(this);
@@ -47,12 +51,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		photoPickerIntent.setType("image/*");
 		startActivityForResult(photoPickerIntent, SELECT_PHOTO);
 	}
-
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// getMenuInflater().inflate(R.menu.main_layout, menu);
-	// return true;
-	// }
 
 	private class AsyncBitmapBuilder extends AsyncTask<Uri, Integer, Boolean> {
 
@@ -85,16 +83,25 @@ public class MainActivity extends Activity implements OnClickListener {
 			// Get the boundary
 			int width_tmp = o.outWidth, height_tmp = o.outHeight;
 			int boundary = width_tmp > height_tmp ? width_tmp : height_tmp;
-			boolean landScape = true;
-			if (boundary == height_tmp) { landScape = false; }
-
 			Log.d(TAG, "The boundary of the photo: " + boundary);
 
 			if (boundary < 1) { return false; }
 
+			// set inPurgeable to true hence they can be purged if the system needs to reclaim memory.
 			o = new BitmapFactory.Options();
 			o.inPurgeable = true;
+			o.inSampleSize = 1;
 
+			// If the boundary is bigger than the max boundary, down sampling the source bitmap
+			while (boundary > gMaxBoundary) {
+				o.inSampleSize++;
+				boundary /= 2;
+			}
+
+			width_tmp /= o.inSampleSize;
+			height_tmp /= o.inSampleSize;
+
+			// reflection to set the hidden variable for allocating memory to native not heap memory.
 			try { BitmapFactory.Options.class.getField("inNativeAlloc").setBoolean(o, true); }
 			catch (Exception e) { e.printStackTrace(); }
 
@@ -105,14 +112,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				return false;
 			}
 
+			// Create a 1:1 size blank bitmap.
 			Bitmap bitmap = Bitmap.createBitmap(boundary, boundary, Config.ARGB_8888);
 			Canvas canvas = new Canvas(bitmap);
 			Paint paint = new Paint();
+			// fill out the bitmap with black and put the source bitmap at the center 
 			paint.setColor(Color.BLACK);
 			canvas.drawRect(new Rect(0, 0, boundary, boundary), paint);
-			if (landScape) { canvas.drawBitmap(srcBitmap, 0, (boundary - height_tmp) / 2, paint); }
-			else { canvas.drawBitmap(srcBitmap, (boundary - width_tmp) / 2, 0, paint); }
-
+			canvas.drawBitmap(srcBitmap, ((boundary - width_tmp) / 2), ((boundary - height_tmp) / 2), paint);
 			canvas.save(Canvas.ALL_SAVE_FLAG);
 			canvas.restore();
 
@@ -121,6 +128,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			File myDrawFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Black_Border_" + currentDateandTime + ".jpg");
 			FileOutputStream fos = null;
+			
+			Log.d(TAG, "File will be saved at " + myDrawFile.getPath());
 
 			try {
 				fos = new FileOutputStream(myDrawFile);
@@ -144,10 +153,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 				cursor.moveToFirst();
 				resultPath = cursor.getString(column_index);
-				cursor.close();
-				cursor = null;
 			}
-
 			return resultPath;
 		}
 	}
