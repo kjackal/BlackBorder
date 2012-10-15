@@ -5,8 +5,6 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.jackal.photoeditor.black.bounder.R;
-
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;

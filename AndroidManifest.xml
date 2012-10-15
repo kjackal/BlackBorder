@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jackal.photoeditor.black.bounder"
+    package="com.jackal.photoeditor.black.border"
     android:versionCode="1"
     android:versionName="1.0" >
 
