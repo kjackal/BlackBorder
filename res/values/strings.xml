@@ -5,6 +5,7 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Black Border</string>
     <string name="startButton">Select</string>
-    <string name="toastDone"> Done</string>
+    <string name="toastDone">Done</string>
+    <string name="toastFail">Failed</string>
 
 </resources>
