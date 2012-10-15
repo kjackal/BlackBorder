@@ -90,7 +90,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			// set inPurgeable to true hence they can be purged if the system needs to reclaim memory.
 			o = new BitmapFactory.Options();
 			o.inPurgeable = true;
-			o.inSampleSize = 1;
+			//o.inSampleSize = 1;
+			o.inSampleSize = 2;
+			boundary /= 2;
 
 			// If the boundary is bigger than the max boundary, down sampling the source bitmap
 			while (boundary > gMaxBoundary) {
@@ -98,8 +100,13 @@ public class MainActivity extends Activity implements OnClickListener {
 				boundary /= 2;
 			}
 
-			width_tmp /= o.inSampleSize;
-			height_tmp /= o.inSampleSize;
+			//if (o.inSampleSize > 2) {
+			width_tmp /= (o.inSampleSize - 1) * 2;
+			height_tmp /= (o.inSampleSize - 1) * 2;				
+			//} else {
+				//width_tmp /= o.inSampleSize;
+				//height_tmp /= o.inSampleSize;
+			//}
 
 			// reflection to set the hidden variable for allocating memory to native not heap memory.
 			try { BitmapFactory.Options.class.getField("inNativeAlloc").setBoolean(o, true); }
