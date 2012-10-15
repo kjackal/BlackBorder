@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Black Border</string>
+    <string name="hello_world">Add black border to selected photo.</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Black Border</string>
+    <string name="startButton">Select</string>
+    <string name="toastDone"> Done</string>
+
+</resources>
