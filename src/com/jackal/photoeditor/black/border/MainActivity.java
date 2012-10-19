@@ -30,14 +30,14 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final int SELECT_PHOTO = 100;
 	private static final int DOWN_SAMPLE_BOUNDARY = 1080;
 	private static final String TAG = "Black_Border";
-	private long gMaxBoundary = -1;
+	private static long gMaxBoundary = -1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_layout);
 		
-		// Get the max heap size to get the max boundary to avoid OutOfMemory excpetion.
+		// Get the max heap size to get the max boundary to avoid OutOfMemory exception.
 		long maxMemory = Runtime.getRuntime().maxMemory();
 		gMaxBoundary = (long) Math.pow((maxMemory /4), 0.5);
 		Log.d(TAG, "The maxMemory: " + maxMemory + ", maxBoundary: " + gMaxBoundary);
@@ -132,24 +132,27 @@ public class MainActivity extends Activity implements OnClickListener {
 			canvas.drawBitmap(srcBitmap, ((boundary - width_tmp) / 2), ((boundary - height_tmp) / 2), paint);
 			canvas.save(Canvas.ALL_SAVE_FLAG);
 			canvas.restore();
+			srcBitmap.recycle();
 
+			// Create the Black_Border folder in the sdcard if need and the file name is the timestamp of current time
+			File BlackBorderDirectory = new File(Environment.getExternalStorageDirectory().getPath() + "/Black_Border/");
+			BlackBorderDirectory.mkdirs();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
 			String currentDateandTime = sdf.format(new Date());
+			File myDrawFile = new File(BlackBorderDirectory, currentDateandTime + ".jpg");
 
-			File myDrawFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Black_Border_" + currentDateandTime + ".jpg");
 			FileOutputStream fos = null;
-			
-			Log.d(TAG, "File will be saved at " + myDrawFile.getPath());
 
 			try {
+				Log.d(TAG, "File will be saved at " + myDrawFile.getPath());
 				fos = new FileOutputStream(myDrawFile);
 				bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fos);
 				fos.flush();
 				fos.close();
 			} catch (Exception e) { e.printStackTrace(); }
 
-			srcBitmap.recycle();
 			bitmap.recycle();
+			System.gc();
 
 			return true;
 		}

@@ -5,7 +5,7 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">Black Border</string>
     <string name="startButton">Select</string>
-    <string name="toastDone">Done</string>
-    <string name="toastFail">Failed</string>
+    <string name="toastDone">The selected image had added black border successfully.</string>
+    <string name="toastFail">The selected image failed to add black border.</string>
 
 </resources>
