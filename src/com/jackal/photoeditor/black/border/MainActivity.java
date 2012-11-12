@@ -91,6 +91,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			// set inPurgeable to true hence they can be purged if the system needs to reclaim memory.
 			o = new BitmapFactory.Options();
 			o.inPurgeable = true;
+			o.inInputShareable = true;
 			//o.inSampleSize = 1;
 			if (boundary > DOWN_SAMPLE_BOUNDARY) {
 				o.inSampleSize = 2;
@@ -149,6 +150,12 @@ public class MainActivity extends Activity implements OnClickListener {
 				bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fos);
 				fos.flush();
 				fos.close();
+
+				// Let media scanner scan this file in order to show up in album.
+				Intent i = new Intent();
+				i.setAction("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+				i.setData(Uri.fromFile(myDrawFile));
+				sendBroadcast(i);
 			} catch (Exception e) { e.printStackTrace(); }
 
 			bitmap.recycle();
