@@ -1,11 +1,13 @@
 <resources>
 
-    <string name="app_name">Black Border</string>
-    <string name="hello_world">Add black border to selected photo.</string>
+    <string name="app_name">Photo Border</string>
+    <string name="hello_world">　Add b/w border to selected photo.　</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">Black Border</string>
+    <string name="title_activity_main">Photo Border</string>
     <string name="startButton">Select</string>
     <string name="toastDone">The selected image had added black border successfully.</string>
     <string name="toastFail">The selected image failed to add black border.</string>
+    <string name="radioBlack">Black border</string>
+    <string name="radioWhite">White border</string>
 
 </resources>
